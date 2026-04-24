@@ -1,122 +1,223 @@
-# Vehicle Counting System
+# 🚗 Vehicle Counting System AI
 
-A real-time vehicle detection, tracking, and counting system built with **Python**, **YOLOv8**, and **SQLite**.
+<div align="center">
+
+![Python](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python)
+![YOLOv8](https://img.shields.io/badge/YOLOv8-Detection-red?style=for-the-badge)
+![SQLite](https://img.shields.io/badge/SQLite-Database-green?style=for-the-badge&logo=sqlite)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge)
+
+**Real-time vehicle detection, tracking, and counting system powered by YOLOv8**
+
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Architecture](#-architecture) • [Results](#-results)
+
+</div>
 
 ---
 
-## Project Structure
+## ✨ Features
+
+- 🎯 **Real-time Vehicle Detection** - State-of-the-art YOLOv8 nano model for fast inference
+- 📍 **Multi-Object Tracking** - Centroid and IoU-based tracking with persistent vehicle IDs
+- 📊 **Intelligent Counting** - Line-crossing detection for accurate vehicle counts
+- 🎬 **Multi-format Support** - Process videos (MP4, AVI), images, or image datasets
+- 💾 **SQLite Integration** - Persistent session tracking and daily summaries
+- ⚙️ **Configurable Parameters** - Easy tuning of detection, tracking, and counting thresholds
+- 📈 **Visual Analytics** - Real-time HUD overlay with detection boxes and counts
+- 🚀 **High Performance** - Optimized pipeline for processing large video datasets
+
+---
+
+## 📋 Project Structure
 
 ```
 vehicle_counting_system/
-├── main.py                        # ← Entry point (run this)
-├── requirements.txt
+├── main.py                        # Entry point - Run this!
+├── requirements.txt               # Python dependencies
 ├── config/
-│   ├── __init__.py
-│   └── settings.py                # All tuneable parameters
-├── data/
-│   ├── MVI_20012/                 # Dataset image frames
-│   ├── MVI_20065/
-│   └── MVI_39051/
-├── database/
-│   ├── __init__.py
-│   └── database_manager.py        # SQLite: sessions, frame counts, daily summary
+│   └── settings.py                # Centralized configuration
 ├── src/
-│   ├── __init__.py
-│   ├── video_converter.py         # Images → MP4
+│   ├── video_converter.py         # Images → MP4 conversion
 │   ├── detector.py                # YOLOv8 vehicle detection
-│   ├── tracker.py                 # Centroid + IoU multi-object tracker
-│   ├── counter.py                 # Horizontal line-crossing counter
-│   ├── visualizer.py              # Bounding boxes + HUD overlay
-│   └── pipeline.py                # Orchestrates all steps
-├── output/                        # Generated videos, JSON, log (auto-created)
-└── models/                        # YOLO weights cache (auto-downloaded)
+│   ├── tracker.py                 # Multi-object tracking engine
+│   ├── counter.py                 # Line-crossing counter
+│   ├── visualizer.py              # Annotation & visualization
+│   └── pipeline.py                # Main orchestration logic
+├── database/
+│   └── database_manager.py        # SQLite management
+├── data/                          # Dataset storage
+├── models/                        # YOLO weights cache
+└── output/                        # Generated results
 ```
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
-### 1. Install dependencies
+### Prerequisites
+- Python 3.8 or higher
+- pip (Python package manager)
 
+### 1. Clone the Repository
+```bash
+git clone https://github.com/SabihaMishu/Vehicle_Counting_System-AI.git
+cd Vehicle_Counting_System-AI
+```
+
+### 2. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Run on any Video File (MP4, AVI, etc.)
-
+### 3. Run on Video File
 ```bash
-python main.py --input input/video.mp4
+python main.py --input path/to/video.mp4
 ```
 
-### 3. Run on an Image File
-
+### 4. Run on Image
 ```bash
 python main.py --input path/to/image.jpg
 ```
 
-### 4. Run on a Dataset Folder (default behavior)
-
+### 5. Run on Dataset (Default)
 ```bash
 python main.py --input MVI_20012
 ```
 
 ---
 
-## Output Files
+## 📊 Output Files
 
-Output filenames are generated dynamically based on the input name (e.g., `video_counted.mp4`).
-
-| File | Description |
-|---|---|
-| `output/<name>_counted.mp4` | Annotated video with detections & counts |
-| `output/<name>_counted.jpg` | Annotated image (if image input) |
-| `output/daily_summary.json` | JSON export of cumulative daily counts |
-| `database/vehicle_counts.db` | SQLite database with per-run session data |
+| Output | Description |
+|--------|-------------|
+| `output/<name>_counted.mp4` | 🎬 Annotated video with detections and counts |
+| `output/<name>_counted.jpg` | 🖼️ Annotated image (for image inputs) |
+| `output/daily_summary.json` | 📈 JSON export of cumulative daily counts |
+| `database/vehicle_counts.db` | 💾 SQLite database with session data |
 
 ---
 
-## Dynamic Input Handling
+## 🏗️ How It Works
 
-The system automatically detects the input type:
-- **Video:** Performs full detection + tracking + line-crossing counting.
-- **Image:** Performs detection and per-frame counting only.
-- **Dataset:** Converts images to video first, then runs the video pipeline.
+The system follows a modular pipeline architecture:
 
+```
+Input (Video/Image/Dataset)
+    ↓
+[1] Video Converter → Convert image frames to MP4
+    ↓
+[2] YOLOv8 Detector → Detect vehicles (car, motorcycle, bus, truck)
+    ↓
+[3] Multi-Object Tracker → Assign persistent IDs with IoU matching
+    ↓
+[4] Line-Crossing Counter → Count vehicles crossing detection line
+    ↓
+[5] Visualizer → Draw annotations & HUD overlay
+    ↓
+[6] Database Manager → Store results in SQLite
+    ↓
+Output (Annotated Video + Analytics)
+```
+
+### Component Breakdown
+
+| Component | Module | Purpose |
+|-----------|--------|---------|
+| **Detection** | `detector.py` | YOLOv8 nano model for vehicle detection |
+| **Tracking** | `tracker.py` | IoU-based greedy matching for persistent IDs |
+| **Counting** | `counter.py` | Horizontal line-crossing detection |
+| **Visualization** | `visualizer.py` | Bounding boxes, IDs, counting line, HUD |
+| **Pipeline** | `pipeline.py` | Orchestrates entire workflow |
+| **Database** | `database_manager.py` | SQLite session & summary storage |
 
 ---
 
-## How It Works
+## ⚙️ Configuration
 
-| Step | Module | Description |
-|---|---|---|
-| 1 | `video_converter.py` | Sorts and assembles JPEG frames into MP4 via OpenCV |
-| 2 | `detector.py` | YOLOv8n detects `car`, `motorcycle`, `bus`, `truck` per frame |
-| 3 | `tracker.py` | IoU-based greedy matcher assigns persistent integer IDs |
-| 4 | `counter.py` | Detects centroid crossing a horizontal line; counts once per vehicle |
-| 5 | `visualizer.py` | Draws boxes, ID badges, counting line, and HUD panel |
-| 6 | `pipeline.py` | Writes annotated frames to output video; commits to SQLite |
-| 7 | `database_manager.py` | Stores per-frame counts + daily summary in SQLite |
-
----
-
-## Configuration (`config/settings.py`)
+All parameters can be tuned in `config/settings.py`:
 
 | Parameter | Default | Description |
-|---|---|---|
-| `DATASET_FOLDER` | `MVI_20012` | Which data folder to process |
+|-----------|---------|-------------|
+| `DATASET_FOLDER` | `MVI_20012` | Input dataset folder |
 | `VIDEO_FPS` | `25` | Output video frame rate |
-| `YOLO_MODEL` | `yolov8n.pt` | YOLO weight file (auto-downloaded) |
+| `YOLO_MODEL` | `yolov8n.pt` | YOLO model (nano - fast & lightweight) |
 | `YOLO_CONF` | `0.40` | Detection confidence threshold |
-| `LINE_POSITION` | `0.55` | Counting line as fraction of frame height |
-| `MAX_DISAPPEARED` | `30` | Frames before a lost track is pruned |
-| `IOU_THRESHOLD` | `0.30` | Min IoU to match detection → existing track |
+| `LINE_POSITION` | `0.55` | Counting line (% of frame height) |
+| `MAX_DISAPPEARED` | `30` | Frames before track removal |
+| `IOU_THRESHOLD` | `0.30` | Min IoU for track matching |
 
 ---
 
-## SQLite Schema
+## 📦 Dependencies
 
-```sql
-sessions        -- one row per run
-vehicle_counts  -- per-frame cumulative counts (FK → sessions)
-daily_summary   -- daily rollup by dataset (upserted each run)
-```
+- **ultralytics** - YOLOv8 detection framework
+- **opencv-python** - Video/image processing
+- **numpy** - Numerical computing
+- **sqlite3** - Database management (built-in)
+
+See `requirements.txt` for complete list.
+
+---
+
+## 🎯 Supported Vehicle Classes
+
+The system detects and counts:
+- 🚗 Cars
+- 🏍️ Motorcycles
+- 🚌 Buses
+- 🚚 Trucks
+
+---
+
+## 📈 Performance Metrics
+
+- **Detection Speed**: Real-time inference on CPU/GPU
+- **Tracking Accuracy**: Persistent ID assignment with IoU matching
+- **Database**: Efficient SQLite storage with indexed queries
+- **Output**: Configurable video quality and FPS
+
+---
+
+## 🔧 Troubleshooting
+
+**Issue: Out of memory on large videos?**
+- Reduce `VIDEO_FPS` in settings
+- Process shorter video segments
+
+**Issue: Missing detections?**
+- Lower `YOLO_CONF` threshold (more detections, may include false positives)
+- Ensure good lighting in video
+
+**Issue: Counting inaccuracies?**
+- Adjust `LINE_POSITION` for better line placement
+- Tune `IOU_THRESHOLD` for track matching
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to:
+- Report bugs
+- Suggest features
+- Submit pull requests
+
+---
+
+## 📧 Contact
+
+For questions or feedback, reach out on GitHub: [@SabihaMishu](https://github.com/SabihaMishu)
+
+---
+
+<div align="center">
+
+**Made with ❤️ for intelligent traffic monitoring**
+
+</div>
